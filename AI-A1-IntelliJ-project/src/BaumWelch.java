@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class BaumWelch {
   private Model model;
   private int[] obsSeq;
@@ -85,12 +83,50 @@ public class BaumWelch {
         }
   }
 
-  private void reestimateModel() {
-
+  private void reestimatePi() {
+    model.pi = gamma[0];
   }
 
-  private void run() {
+  private void reestimateA() {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        double numer = 0;
+        double denom = 0;
+        for (int t = 0; t < maxT - 1; t++) {
+          numer += digamma[t][i][j];
+          denom += gamma[t][i];
+        }
+        model.a[i][j] = numer / denom;
+      }
+    }
+  }
 
+  private void reestimateModel() {
+    gammaDigamma();
+    reestimatePi();
+    reestimateA();
+  }
+
+  private double computeLogProb() {
+    double logProb = 0;
+    for (double c : cs)
+      logProb += Math.log(c);
+    return logProb;
+  }
+
+  public void run() {
+    int maxIters = 30;
+    int iters = 0;
+    double oldLogProb = -1000;
+    double logProb = -999;
+    while (iters < maxIters && logProb > oldLogProb) {
+      oldLogProb = logProb;
+      alphaPass();
+      betaPass();
+      reestimateModel();
+      logProb = computeLogProb();
+      iters++;
+    }
   }
 
   private void reestimateB() {
