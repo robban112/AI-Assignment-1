@@ -1,12 +1,8 @@
-class Model {
-
-}
-
 public class BaumWelch {
   private Model model;
   private int[] obsSeq;
   private int n, m, t;
-  private int[][] alpha;
+  private double[][] alpha;
 
   public BaumWelch(Model initialModel, int[] obsSeq, int n, int m) {
     this.model = initialModel;
