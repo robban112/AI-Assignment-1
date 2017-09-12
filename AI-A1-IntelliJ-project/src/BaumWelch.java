@@ -1,5 +1,5 @@
 public class BaumWelch {
-  private Model model;
+  public Model model;
   private int[] obsSeq;
   private int n, m, maxT;
   private double[][] alpha, beta;
@@ -58,11 +58,11 @@ public class BaumWelch {
       beta[maxT-1][i] = cs[maxT-1];
 
     // compute beta[0..T-2]
-    for (int t = maxT-2; t <= 0; t--) {
+    for (int t = maxT-2; t >= 0; t--) {
       for (int i = 0; i < n; i++) {
         beta[t][i] = 0;
         for (int j = 0; j < n; j++)
-          beta[t][i] = beta[t+1][j]*model.a[i][j]*model.b[j][obsSeq[t+1]];
+          beta[t][i] += beta[t+1][j]*model.a[i][j]*model.b[j][obsSeq[t+1]];
         // scale beta[t][i]
         beta[t][i] *= cs[t];
       }
@@ -70,17 +70,25 @@ public class BaumWelch {
   }
 
   private void gammaDigamma() {
-      for (int t = 0; t < maxT-1; t++)
-        for (int i = 0; i < n; i++) {
-          gamma[t][i] = 0;
-          double denom = 0;
-          for (int j = 0; j < n; j++)
-            denom += alpha[t][i] * model.a[i][j] * beta[t+1][j];
-          for (int j = 0; j < n; j++) {
-            digamma[t][i][j] = (alpha[t][i]*model.a[i][j]*beta[t+1][j])/denom;
-            gamma[t][i] += digamma[t][i][j];
-          }
+    for (int t = 0; t < maxT-1; t++) {
+      double denom = 0;
+      for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+          denom += alpha[t][i]*model.a[i][j]*model.b[j][obsSeq[t+1]]*beta[t+1][j];
+      for (int i = 0; i < n; i++) {
+        gamma[t][i] = 0;
+        for (int j = 0; j < n; j++) {
+          digamma[t][i][j] = (alpha[t][i]*model.a[i][j]*model.b[j][obsSeq[t+1]]*beta[t+1][j])/denom;
+          gamma[t][i] += digamma[t][i][j];
         }
+      }
+    }
+    // special case for gamma[T-1]
+    double denom = 0;
+    for (int i = 0; i < n; i++)
+      denom += alpha[maxT-1][i];
+    for (int i = 0; i < n; i++)
+      gamma[maxT-1][i] = alpha[maxT-1][i] / denom;
   }
 
   private void reestimatePi() {
@@ -88,7 +96,7 @@ public class BaumWelch {
   }
 
   private void reestimateA() {
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
       for (int j = 0; j < n; j++) {
         double numer = 0;
         double denom = 0;
@@ -98,11 +106,10 @@ public class BaumWelch {
         }
         model.a[i][j] = numer / denom;
       }
-    }
   }
 
   private void reestimateB() {
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
       for (int j = 0; j < m; j++) {
         double numer = 0;
         double denom = 0;
@@ -114,7 +121,6 @@ public class BaumWelch {
         }
         model.b[i][j] = numer / denom;
       }
-    }
   }
 
   private void reestimateModel() {
@@ -132,11 +138,11 @@ public class BaumWelch {
   }
 
   public void run() {
-    int maxIters = 30;
+    int maxIters = 200;
     int iters = 0;
     double oldLogProb = -1000;
     double logProb = -999;
-    while (iters < maxIters && logProb > oldLogProb) {
+    while (iters < maxIters) {
       oldLogProb = logProb;
       alphaPass();
       betaPass();
