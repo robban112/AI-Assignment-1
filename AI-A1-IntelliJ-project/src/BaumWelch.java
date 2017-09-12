@@ -92,4 +92,20 @@ public class BaumWelch {
   private void run() {
 
   }
+
+  private void reestimateB() {
+    for(int i = 0; i<n; i++) {
+      for(int j = 0; j<m; j++) {
+        double numer = 0;
+        double denom = 0;
+        for(int t = 0; t<maxT; t++){
+          denom += gamma[t][i];
+          if (obsSeq[t] == j){
+            numer += gamma[t][i];
+          }
+        }
+      }
+      model.b[i][j] = numer / denom;
+    }
+  }
 }
