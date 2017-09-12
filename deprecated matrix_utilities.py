@@ -13,14 +13,6 @@ def string_to_matrix(line):
         rows.append(elems[start:end])
     return rows
 
-def matrix_to_string(matrix):
-    if len(matrix) == 0:
-        return "0 0"
-    dims_info = str(len(matrix)) + " " + str(len(matrix[0]))
-
-    row_to_str = lambda r: " ".join(map(str, r))
-    return dims_info + " " + " ".join(map(row_to_str, matrix))
-
 def transp(mat):
     return list(map(list, zip(*mat)))
 
