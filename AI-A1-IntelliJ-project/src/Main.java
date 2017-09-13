@@ -7,6 +7,25 @@ public class Main {
     int m = model.b[0].length;
     BaumWelch bw = new BaumWelch(model, obsSeq, n, m);
     bw.run();
-    MatrixUtils.prettyPrint(bw.model.a);
+    printModel(bw.model);
+    //MatrixUtils.prettyPrint(bw.model.a);
+  }
+
+  public static void printModel(Model model) {
+    printMatrix(model.a);
+    printMatrix(model.b);
+  }
+
+  public static void printMatrix(double[][] matrix) {
+    System.out.print(matrix.length + " " + matrix[0].length + " ");
+    for (int r = 0; r<matrix.length; r++) {
+      for (int c = 0; c<matrix[r].length; c++) {
+        System.out.print(matrix[r][c]);
+        if(r != matrix.length-1 || c != matrix[r].length-1) {
+          System.out.print(" ");
+        }
+      }
+    }
+    System.out.println();
   }
 }
