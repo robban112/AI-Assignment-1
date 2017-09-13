@@ -135,15 +135,15 @@ public class BaumWelch {
     double logProb = 0;
     for (double c : cs)
       logProb += Math.log(c);
-    return logProb;
+    return -logProb;
   }
 
   public void run() {
-    int maxIters = 200;
+    int maxIters = 30;
     int iters = 0;
-    double oldLogProb = -1000;
-    double logProb = -999;
-    while (iters < maxIters) {
+    double oldLogProb = -1000000;
+    double logProb = -999999;
+    while (iters < maxIters && oldLogProb < logProb) {
       oldLogProb = logProb;
       alphaPass();
       betaPass();
