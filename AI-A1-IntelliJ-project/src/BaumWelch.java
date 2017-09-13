@@ -41,7 +41,8 @@ public class BaumWelch {
       for (int i = 0; i < n; i++) {
         alpha[t][i] = 0;
         for (int j = 0; j < n; j++)
-          alpha[t][i] += alpha[t-1][j]*model.a[j][i]*model.b[i][obsSeq[t]];
+          alpha[t][i] += alpha[t-1][j]*model.a[j][i];
+        alpha[t][i] *= model.b[i][obsSeq[t]];
         cs[t] += alpha[t][i];
       }
 

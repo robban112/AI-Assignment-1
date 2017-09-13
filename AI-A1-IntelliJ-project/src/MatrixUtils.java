@@ -16,4 +16,14 @@ public class MatrixUtils {
     }
     return resVec;
   }
+
+  public static void prettyPrint(double[][] mat) {
+    for (int i = 0; i < mat.length; i++) {
+      System.out.println();
+      for (int j = 0; j < mat[0].length; j++) {
+        System.out.printf("%.6f ", mat[i][j]);
+      }
+    }
+    System.out.println();
+  }
 }
